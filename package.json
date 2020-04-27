@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "package": "npx ncc build src/main.js -o dist",
-    "test": "npx mocha ./**/*.test.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -24,15 +24,12 @@
   "author": "Matthew Coleman <matthewdecoleman@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.0",
-    "aws-sdk": "^2.586.0",
-    "uuid": "^3.3.3"
+    "@actions/core": "^1.2.3",
+    "aws-sdk": "^2.663.0",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.20.5",
-    "dotenv": "^8.2.0",
-    "mocha": "^6.2.2",
-    "should": "^13.2.3",
-    "sinon": "^7.5.0"
+    "@zeit/ncc": "^0.22.1",
+    "jest": "^25.4.0"
   }
 }

@@ -1,5 +1,5 @@
 const { existsSync, readFileSync } = require("fs");
-const CloudFormation = require("aws-sdk/clients/cloudformation");
+const AWS = require("aws-sdk");
 const uuidV4 = require("uuid/v4");
 
 async function createChangeSet(inputs) {
@@ -15,7 +15,7 @@ async function createChangeSet(inputs) {
   if (existsSync(templateFile)) {
     const file = await readFileSync(templateFile);
 
-    const cfn = new CloudFormation({
+    const cfn = new AWS.CloudFormation({
       accessKeyId: awsAccessKeyId,
       secretAccessKey: awsSecretAccessKey,
       region: awsRegion
@@ -59,7 +59,7 @@ async function executeChangeSet(inputs) {
     stackName
   } = inputs;
 
-  const cfn = new CloudFormation({
+  const cfn = new AWS.CloudFormation({
     accessKeyId: awsAccessKeyId,
     secretAccessKey: awsSecretAccessKey,
     region: awsRegion
@@ -79,7 +79,7 @@ async function deleteChangeSet(inputs) {
     stackName
   } = inputs;
 
-  const cfn = new CloudFormation({
+  const cfn = new AWS.CloudFormation({
     accessKeyId: awsAccessKeyId,
     secretAccessKey: awsSecretAccessKey,
     region: awsRegion
