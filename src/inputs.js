@@ -7,6 +7,7 @@ function getInputs() {
     awsRegion: core.getInput("aws_region"),
     awsSecretAccessKey: core.getInput("aws_secret_access_key"),
     changeSetName: core.getInput("changeset_name"),
+    description: core.getInput("description"),
     parameters: core.getInput("parameters"),
     stackName: core.getInput("stack_name"),
     templateFile: core.getInput("template_file")

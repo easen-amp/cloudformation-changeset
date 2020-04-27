@@ -25,6 +25,9 @@ inputs:
   changeset_name:
     description: Name of changeset
     required: false
+  description:
+    description: Description of changeset
+    required: false
 outputs:
   changeset_id:
     description: "The changeset id"

@@ -1,6 +1,6 @@
 const { existsSync, readFileSync } = require("fs");
 const AWS = require("aws-sdk");
-const uuidV4 = require("uuid/v4");
+const uuid = require("uuid");
 
 async function createChangeSet(inputs) {
   const {
@@ -9,7 +9,9 @@ async function createChangeSet(inputs) {
     awsSecretAccessKey,
     parameters,
     stackName,
-    templateFile
+    templateFile,
+    changeSetName,
+    description
   } = inputs;
 
   if (existsSync(templateFile)) {
@@ -21,14 +23,17 @@ async function createChangeSet(inputs) {
       region: awsRegion
     });
 
-    let params = {
+    const params = {
       Capabilities: ["CAPABILITY_IAM"],
       ChangeSetType: "CREATE",
-      ChangeSetName: `${stackName}-${uuidV4()}`,
+      ChangeSetName: changeSetName || `${stackName}-${uuid.v4()}`,
       StackName: stackName,
       TemplateBody: file.toString(),
       Parameters: []
     };
+    if (description) {
+      params.Description = description;
+    }
 
     if (parameters && parameters.trim() !== "") {
       const keyValues = parameters.split(",");

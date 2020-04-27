@@ -11,6 +11,8 @@ GitHub Action that creates, deletes and executes CloudFormation change sets.
   with:
     method: create
     stack_name: "some-stack"
+    changeset_name: "some-changeset-name"
+    description: "some-description"
     template_file: "./path/to/template.yml"
     aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

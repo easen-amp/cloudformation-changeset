@@ -19,6 +19,9 @@ jest.mock('aws-sdk', () => {
   };
 });
 
+jest.mock('uuid');
+
+const uuid = require('uuid');
 const { createChangeSet, deleteChangeSet, executeChangeSet } = require('./changeSetActions');
 
 describe('changeSetActions', function () {
@@ -29,26 +32,72 @@ describe('changeSetActions', function () {
   });
 
   describe('create', function () {
-    it('should return changeset id and name', async function () {
-      const templateFile = join(__dirname, '__fixtures__', 'template.yml');
-      const inputs = {
-        awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        awsRegion: 'eu-west-1',
-        awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        stackName: STACK_NAME,
-        templateFile: templateFile,
-      };
+    const templateFile = join(__dirname, '__fixtures__', 'template.yml');
+    const inputs = {
+      awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      awsRegion: 'eu-west-1',
+      awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      stackName: STACK_NAME,
+      templateFile: templateFile,
+      parameters: 'foo=123,bar=abc',
+    };
 
-      const response = await createChangeSet(inputs);
-
-      expect(mockCloudFormation.createChangeSet).toHaveBeenCalledWith({
+    let expectedCreateChangeSetParam;
+    beforeAll(async () => {
+      expectedCreateChangeSetParam = {
         Capabilities: ['CAPABILITY_IAM'],
         ChangeSetName: expect.any(String),
         ChangeSetType: 'CREATE',
-        Parameters: [],
+        Parameters: [
+          {
+            ParameterKey: 'foo',
+            ParameterValue: '123',
+          },
+          {
+            ParameterKey: 'bar',
+            ParameterValue: 'abc',
+          },
+        ],
         StackName: 'cfn-deploy-changeset-action-test-stack',
         TemplateBody: await readFileSync(templateFile).toString(),
+      };
+    });
+
+    it('should create a changeset using a uuid', async function () {
+      const response = await createChangeSet(inputs);
+
+      expect(mockCloudFormation.createChangeSet).toHaveBeenCalledWith(expectedCreateChangeSetParam);
+      expect(uuid.v4).toHaveBeenCalled();
+      expect(response.id).not.toBeNull();
+      expect(response.name).not.toBeNull();
+    });
+
+    it('should throw an error when an invalid template is supplied', async function () {
+      await expect(() => createChangeSet({ ...inputs, templateFile: 'invalid_file' })).rejects.toThrow();
+    });
+
+    it('should create a changeset using the supplied changeSetName', async function () {
+      const changeSetName = 'custom-change-set-name';
+      const response = await createChangeSet({ ...inputs, changeSetName });
+
+      expect(mockCloudFormation.createChangeSet).toHaveBeenCalledWith({
+        ...expectedCreateChangeSetParam,
+        ChangeSetName: changeSetName,
       });
+      expect(uuid.v4).not.toHaveBeenCalled();
+      expect(response.id).not.toBeNull();
+      expect(response.name).not.toBeNull();
+    });
+
+    it('should create a changeset using the supplied description', async function () {
+      const description = 'custom-description';
+      const response = await createChangeSet({ ...inputs, description });
+
+      expect(mockCloudFormation.createChangeSet).toHaveBeenCalledWith({
+        ...expectedCreateChangeSetParam,
+        Description: description,
+      });
+      expect(uuid.v4).toHaveBeenCalled();
       expect(response.id).not.toBeNull();
       expect(response.name).not.toBeNull();
     });

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "package": "npx ncc build src/main.js -o dist",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
